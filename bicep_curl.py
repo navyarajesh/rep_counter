@@ -211,6 +211,7 @@
 import cv2
 import math
 import mediapipe as mp
+import os
 
 # Function to calculate the angle between the shoulder, elbow, and wrist
 def calculate_angle(shoulder, elbow, wrist):
@@ -230,6 +231,11 @@ def calculate_angle(shoulder, elbow, wrist):
 def bicep_curl_exercise():
     mp_pose = mp.solutions.pose
     pose = mp_pose.Pose()
+
+    if "STREAMLIT_ENV" in os.environ:  # Streamlit Cloud check
+        print("Running in cloud environment; video capture is disabled.")
+        return  # Skip video capture for cloud deployment
+    
     cap = cv2.VideoCapture(0)
 
     rep_count = 0
