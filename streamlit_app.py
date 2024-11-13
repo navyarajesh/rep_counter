@@ -339,21 +339,45 @@
 #     cap.release()
 # else:
 #     st.info("Please select an exercise to begin.")
+# import streamlit as st
+# from bicep_curl import bicep_curl_exercise
+# from shoulder_press import shoulder_press_exercise
+
+# def main():
+#     st.title("Exercise Counter")
+
+#     exercise = st.selectbox("Select Exercise", ("Bicep Curl", "Shoulder Press"))
+
+#     if exercise == "Bicep Curl":
+#         if st.button("Start Bicep Curl Exercise"):
+#             bicep_curl_exercise()
+#     elif exercise == "Shoulder Press":
+#         if st.button("Start Shoulder Press Exercise"):
+#             shoulder_press_exercise()
+
+# if __name__ == "__main__":
+#     main()
 import streamlit as st
-from bicep_curl import bicep_curl_exercise
-from shoulder_press import shoulder_press_exercise
+from bicep_curl import bicep_curl_exercise  # Import function for bicep curls
+from shoulder_press import shoulder_press_exercise  # Import function for shoulder press
 
 def main():
-    st.title("Exercise Counter")
+    st.title("Exercise Repetition Counter")
+    st.write("Select an exercise below to start counting repetitions:")
 
-    exercise = st.selectbox("Select Exercise", ("Bicep Curl", "Shoulder Press"))
+    # Drop-down menu to choose between exercises
+    exercise = st.selectbox("Choose an Exercise", ["", "Bicep Curl", "Shoulder Press"])
 
+    # Run the corresponding exercise function based on user selection
     if exercise == "Bicep Curl":
-        if st.button("Start Bicep Curl Exercise"):
+        if st.button("Start Bicep Curl"):
             bicep_curl_exercise()
     elif exercise == "Shoulder Press":
-        if st.button("Start Shoulder Press Exercise"):
+        if st.button("Start Shoulder Press"):
             shoulder_press_exercise()
+    else:
+        st.info("Please select an exercise to begin.")
 
 if __name__ == "__main__":
     main()
+

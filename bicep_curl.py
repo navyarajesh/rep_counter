@@ -111,94 +111,158 @@
 
 # cap.release()
 # cv2.destroyAllWindows()
+# import cv2
+# import math
+# import mediapipe as mp
+
+# def calculate_angle(shoulder, elbow, wrist):
+#     # Function to calculate the angle between the shoulder, elbow, and wrist
+#     vector1 = [elbow[0] - shoulder[0], elbow[1] - shoulder[1]]
+#     vector2 = [wrist[0] - elbow[0], wrist[1] - elbow[1]]
+#     dot_product = vector1[0] * vector2[0] + vector1[1] * vector2[1]
+#     magnitude1 = math.sqrt(vector1[0]**2 + vector1[1]**2)
+#     magnitude2 = math.sqrt(vector2[0]**2 + vector2[1]**2)
+#     cos_angle = dot_product / (magnitude1 * magnitude2)
+#     cos_angle = min(1.0, max(cos_angle, -1.0))
+#     angle_radians = math.acos(cos_angle)
+#     return math.degrees(angle_radians)
+
+# def bicep_curl_exercise():
+#     # Mediapipe setup
+#     mp_pose = mp.solutions.pose
+#     pose = mp_pose.Pose()
+
+#     cap = cv2.VideoCapture(0)
+
+#     left_rep_count = 0
+#     right_rep_count = 0
+#     left_in_rep = False
+#     right_in_rep = False
+
+#     left_set_count = 1
+#     right_set_count = 1
+
+#     angle_threshold_lower = 50   
+#     angle_threshold_upper = 160  
+
+#     reps_per_set = 13
+
+#     while cap.isOpened():
+#         ret, frame = cap.read()
+#         if not ret:
+#             break
+
+#         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+#         results = pose.process(frame_rgb)
+
+#         if results.pose_landmarks:
+#             # Extract landmarks for both arms and calculate angles
+#             left_shoulder = (results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].x * frame.shape[1], 
+#                              results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].y * frame.shape[0])
+#             left_elbow = (results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ELBOW].x * frame.shape[1], 
+#                           results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ELBOW].y * frame.shape[0])
+#             left_wrist = (results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST].x * frame.shape[1], 
+#                           results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST].y * frame.shape[0])
+
+#             right_shoulder = (results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].x * frame.shape[1], 
+#                               results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].y * frame.shape[0])
+#             right_elbow = (results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ELBOW].x * frame.shape[1], 
+#                            results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ELBOW].y * frame.shape[0])
+#             right_wrist = (results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_WRIST].x * frame.shape[1], 
+#                            results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_WRIST].y * frame.shape[0])
+
+#             # Calculate angles for both arms
+#             left_angle = calculate_angle(left_shoulder, left_elbow, left_wrist)
+#             right_angle = calculate_angle(right_shoulder, right_elbow, right_wrist)
+
+#             # Rep counting logic for left and right arms
+#             if left_angle > angle_threshold_upper and not left_in_rep:
+#                 left_in_rep = True
+#             elif left_angle < angle_threshold_lower and left_in_rep:
+#                 left_rep_count += 1
+#                 left_in_rep = False
+#                 if left_rep_count == reps_per_set:
+#                     left_rep_count = 0
+#                     left_set_count += 1
+
+#             if right_angle > angle_threshold_upper and not right_in_rep:
+#                 right_in_rep = True
+#             elif right_angle < angle_threshold_lower and right_in_rep:
+#                 right_rep_count += 1
+#                 right_in_rep = False
+#                 if right_rep_count == reps_per_set:
+#                     right_rep_count = 0
+#                     right_set_count += 1
+
+#         cv2.putText(frame, f'Left Reps: {left_rep_count} / Set {left_set_count}', 
+#                     (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
+#         cv2.putText(frame, f'Right Reps: {right_rep_count} / Set {right_set_count}', 
+#                     (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
+#         cv2.imshow('Exercise Form and Reps', frame)
+
+#         if cv2.waitKey(10) & 0xFF == ord('q'):
+#             break
+
+#     cap.release()
+#     cv2.destroyAllWindows()
+
+
+# bicep_curl.py
 import cv2
 import math
 import mediapipe as mp
 
+# Function to calculate the angle between the shoulder, elbow, and wrist
 def calculate_angle(shoulder, elbow, wrist):
-    # Function to calculate the angle between the shoulder, elbow, and wrist
     vector1 = [elbow[0] - shoulder[0], elbow[1] - shoulder[1]]
     vector2 = [wrist[0] - elbow[0], wrist[1] - elbow[1]]
+    
     dot_product = vector1[0] * vector2[0] + vector1[1] * vector2[1]
     magnitude1 = math.sqrt(vector1[0]**2 + vector1[1]**2)
     magnitude2 = math.sqrt(vector2[0]**2 + vector2[1]**2)
+    
     cos_angle = dot_product / (magnitude1 * magnitude2)
     cos_angle = min(1.0, max(cos_angle, -1.0))
     angle_radians = math.acos(cos_angle)
     return math.degrees(angle_radians)
 
+# Main function to run the bicep curl exercise
 def bicep_curl_exercise():
-    # Mediapipe setup
     mp_pose = mp.solutions.pose
     pose = mp_pose.Pose()
-
     cap = cv2.VideoCapture(0)
 
-    left_rep_count = 0
-    right_rep_count = 0
-    left_in_rep = False
-    right_in_rep = False
-
-    left_set_count = 1
-    right_set_count = 1
-
-    angle_threshold_lower = 50   
-    angle_threshold_upper = 160  
-
-    reps_per_set = 13
+    rep_count = 0
+    in_rep = False
+    angle_threshold_lower = 50
+    angle_threshold_upper = 160
 
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
             break
-
+        
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = pose.process(frame_rgb)
-
+        
         if results.pose_landmarks:
-            # Extract landmarks for both arms and calculate angles
-            left_shoulder = (results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].x * frame.shape[1], 
-                             results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].y * frame.shape[0])
-            left_elbow = (results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ELBOW].x * frame.shape[1], 
-                          results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ELBOW].y * frame.shape[0])
-            left_wrist = (results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST].x * frame.shape[1], 
-                          results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST].y * frame.shape[0])
+            shoulder = (results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].x * frame.shape[1], 
+                        results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].y * frame.shape[0])
+            elbow = (results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ELBOW].x * frame.shape[1], 
+                     results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ELBOW].y * frame.shape[0])
+            wrist = (results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST].x * frame.shape[1], 
+                     results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST].y * frame.shape[0])
 
-            right_shoulder = (results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].x * frame.shape[1], 
-                              results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].y * frame.shape[0])
-            right_elbow = (results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ELBOW].x * frame.shape[1], 
-                           results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ELBOW].y * frame.shape[0])
-            right_wrist = (results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_WRIST].x * frame.shape[1], 
-                           results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_WRIST].y * frame.shape[0])
+            angle = calculate_angle(shoulder, elbow, wrist)
+            
+            if angle > angle_threshold_upper and not in_rep:
+                in_rep = True
+            elif angle < angle_threshold_lower and in_rep:
+                rep_count += 1
+                in_rep = False
 
-            # Calculate angles for both arms
-            left_angle = calculate_angle(left_shoulder, left_elbow, left_wrist)
-            right_angle = calculate_angle(right_shoulder, right_elbow, right_wrist)
-
-            # Rep counting logic for left and right arms
-            if left_angle > angle_threshold_upper and not left_in_rep:
-                left_in_rep = True
-            elif left_angle < angle_threshold_lower and left_in_rep:
-                left_rep_count += 1
-                left_in_rep = False
-                if left_rep_count == reps_per_set:
-                    left_rep_count = 0
-                    left_set_count += 1
-
-            if right_angle > angle_threshold_upper and not right_in_rep:
-                right_in_rep = True
-            elif right_angle < angle_threshold_lower and right_in_rep:
-                right_rep_count += 1
-                right_in_rep = False
-                if right_rep_count == reps_per_set:
-                    right_rep_count = 0
-                    right_set_count += 1
-
-        cv2.putText(frame, f'Left Reps: {left_rep_count} / Set {left_set_count}', 
-                    (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-        cv2.putText(frame, f'Right Reps: {right_rep_count} / Set {right_set_count}', 
-                    (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-        cv2.imshow('Exercise Form and Reps', frame)
+        cv2.putText(frame, f'Reps: {rep_count}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+        cv2.imshow('Bicep Curl Exercise', frame)
 
         if cv2.waitKey(10) & 0xFF == ord('q'):
             break
