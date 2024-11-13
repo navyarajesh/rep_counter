@@ -199,10 +199,77 @@
 #     cv2.destroyAllWindows()
 
 # shoulder_press.py
+# import cv2
+# import math
+# import mediapipe as mp
+# import os
+
+# def calculate_angle(shoulder, elbow, wrist):
+#     vector1 = [elbow[0] - shoulder[0], elbow[1] - shoulder[1]]
+#     vector2 = [wrist[0] - elbow[0], wrist[1] - elbow[1]]
+    
+#     dot_product = vector1[0] * vector2[0] + vector1[1] * vector2[1]
+#     magnitude1 = math.sqrt(vector1[0]**2 + vector1[1]**2)
+#     magnitude2 = math.sqrt(vector2[0]**2 + vector2[1]**2)
+    
+#     cos_angle = dot_product / (magnitude1 * magnitude2)
+#     cos_angle = min(1.0, max(cos_angle, -1.0))
+#     angle_radians = math.acos(cos_angle)
+#     return math.degrees(angle_radians)
+
+# def shoulder_press_exercise():
+#     mp_pose = mp.solutions.pose
+#     pose = mp_pose.Pose()
+
+#     if "STREAMLIT_ENV" in os.environ:  # Streamlit Cloud check
+#         print("Running in cloud environment; video capture is disabled.")
+#         return  # Skip video capture for cloud deployment
+    
+#     cap = cv2.VideoCapture(0)
+
+#     rep_count = 0
+#     in_rep = False
+#     angle_threshold_lower = 160
+#     angle_threshold_upper = 30
+
+#     while cap.isOpened():
+#         ret, frame = cap.read()
+#         if not ret:
+#             break
+        
+#         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+#         results = pose.process(frame_rgb)
+        
+#         if results.pose_landmarks:
+#             shoulder = (results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].x * frame.shape[1], 
+#                         results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].y * frame.shape[0])
+#             elbow = (results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ELBOW].x * frame.shape[1], 
+#                      results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ELBOW].y * frame.shape[0])
+#             wrist = (results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST].x * frame.shape[1], 
+#                      results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST].y * frame.shape[0])
+
+#             angle = calculate_angle(shoulder, elbow, wrist)
+            
+#             if angle < angle_threshold_upper and not in_rep:
+#                 in_rep = True
+#             elif angle > angle_threshold_lower and in_rep:
+#                 rep_count += 1
+#                 in_rep = False
+
+#         cv2.putText(frame, f'Shoulder Press Reps: {rep_count}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+#         cv2.imshow('Shoulder Press Exercise', frame)
+
+#         if cv2.waitKey(10) & 0xFF == ord('q'):
+#             break
+
+#     cap.release()
+#     cv2.destroyAllWindows()
+
 import cv2
 import math
 import mediapipe as mp
 import os
+import streamlit as st 
 
 def calculate_angle(shoulder, elbow, wrist):
     vector1 = [elbow[0] - shoulder[0], elbow[1] - shoulder[1]]
@@ -225,18 +292,17 @@ def shoulder_press_exercise():
         print("Running in cloud environment; video capture is disabled.")
         return  # Skip video capture for cloud deployment
     
-    cap = cv2.VideoCapture(0)
+    # Using Streamlit camera input
+    video_frame = st.camera_input("Shoulder Press: Start Camera")
+    if video_frame is not None:
+        frame = video_frame.to_numpy()
 
-    rep_count = 0
-    in_rep = False
-    angle_threshold_lower = 160
-    angle_threshold_upper = 30
+        rep_count = 0
+        in_rep = False
+        angle_threshold_lower = 160
+        angle_threshold_upper = 30
 
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
-        
+        # Processing the frame
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = pose.process(frame_rgb)
         
@@ -256,11 +322,7 @@ def shoulder_press_exercise():
                 rep_count += 1
                 in_rep = False
 
+        # Display the frame with the count
         cv2.putText(frame, f'Shoulder Press Reps: {rep_count}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-        cv2.imshow('Shoulder Press Exercise', frame)
+        st.image(frame, channels="BGR", use_column_width=True)
 
-        if cv2.waitKey(10) & 0xFF == ord('q'):
-            break
-
-    cap.release()
-    cv2.destroyAllWindows()

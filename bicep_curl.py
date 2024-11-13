@@ -208,10 +208,63 @@
 
 
 # bicep_curl.py
+# import os
+# import cv2
+# import math
+# import mediapipe as mp
+
+# def calculate_angle(shoulder, elbow, wrist):
+#     vector1 = [elbow[0] - shoulder[0], elbow[1] - shoulder[1]]
+#     vector2 = [wrist[0] - elbow[0], wrist[1] - elbow[1]]
+#     dot_product = vector1[0] * vector2[0] + vector1[1] * vector2[1]
+#     magnitude1 = math.sqrt(vector1[0]**2 + vector1[1]**2)
+#     magnitude2 = math.sqrt(vector2[0]**2 + vector2[1]**2)
+#     cos_angle = dot_product / (magnitude1 * magnitude2)
+#     cos_angle = min(1.0, max(cos_angle, -1.0))
+#     angle_radians = math.acos(cos_angle)
+#     return math.degrees(angle_radians)
+
+# def bicep_curl_exercise():
+#     if "STREAMLIT_ENV" in os.environ:  # Streamlit Cloud check
+#         print("Running in cloud environment; video capture is disabled.")
+#         return  # Skip video capture for cloud deployment
+
+#     mp_pose = mp.solutions.pose
+#     pose = mp_pose.Pose()
+#     cap = cv2.VideoCapture(0)
+
+#     left_rep_count = 0
+#     right_rep_count = 0
+#     left_in_rep = False
+#     right_in_rep = False
+#     angle_threshold_lower = 50
+#     angle_threshold_upper = 160
+#     reps_per_set = 13
+
+#     while cap.isOpened():
+#         ret, frame = cap.read()
+#         if not ret:
+#             break
+
+#         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+#         results = pose.process(frame_rgb)
+
+#         if results.pose_landmarks:
+#             # Calculations and display logic here, same as before
+
+#             cv2.imshow('Bicep Curl Exercise', frame)
+
+#         if cv2.waitKey(10) & 0xFF == ord('q'):
+#             break
+
+#     cap.release()
+#     cv2.destroyAllWindows()
+
 import os
 import cv2
 import math
 import mediapipe as mp
+import streamlit as st 
 
 def calculate_angle(shoulder, elbow, wrist):
     vector1 = [elbow[0] - shoulder[0], elbow[1] - shoulder[1]]
@@ -231,31 +284,28 @@ def bicep_curl_exercise():
 
     mp_pose = mp.solutions.pose
     pose = mp_pose.Pose()
-    cap = cv2.VideoCapture(0)
 
-    left_rep_count = 0
-    right_rep_count = 0
-    left_in_rep = False
-    right_in_rep = False
-    angle_threshold_lower = 50
-    angle_threshold_upper = 160
-    reps_per_set = 13
+    # Using Streamlit camera input
+    video_frame = st.camera_input("Bicep Curl: Start Camera")
+    if video_frame is not None:
+        frame = video_frame.to_numpy()
+        
+        left_rep_count = 0
+        right_rep_count = 0
+        left_in_rep = False
+        right_in_rep = False
+        angle_threshold_lower = 50
+        angle_threshold_upper = 160
+        reps_per_set = 13
 
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
-
+        # Processing the frame
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = pose.process(frame_rgb)
 
         if results.pose_landmarks:
-            # Calculations and display logic here, same as before
+            # Calculations and display logic for pose landmarks
 
-            cv2.imshow('Bicep Curl Exercise', frame)
+            # Display the frame in Streamlit
+            st.image(frame, channels="BGR", use_column_width=True)
 
-        if cv2.waitKey(10) & 0xFF == ord('q'):
-            break
-
-    cap.release()
-    cv2.destroyAllWindows()
+        # Note: No need for `cv2.waitKey()` or `cv2.imshow()` here

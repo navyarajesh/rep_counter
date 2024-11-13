@@ -381,6 +381,31 @@
 # if __name__ == "__main__":
 #     main()
 
+# import streamlit as st
+# import os
+# from bicep_curl import bicep_curl_exercise
+# from shoulder_press import shoulder_press_exercise
+
+# def main():
+#     st.title("Exercise Repetition Counter")
+#     st.write("Select an exercise below to start counting repetitions:")
+
+#     exercise = st.selectbox("Choose an Exercise", ["", "Bicep Curl", "Shoulder Press"])
+
+#     if "STREAMLIT_ENV" in os.environ:
+#         st.warning("Camera access is disabled in this environment, so exercise counting is unavailable.")
+#     else:
+#         if exercise == "Bicep Curl" and st.button("Start Bicep Curl"):
+#             bicep_curl_exercise()
+#         elif exercise == "Shoulder Press" and st.button("Start Shoulder Press"):
+#             shoulder_press_exercise()
+#         else:
+#             st.info("Please select an exercise to begin.")
+
+# if __name__ == "__main__":
+#     main()
+
+
 import streamlit as st
 import os
 from bicep_curl import bicep_curl_exercise
