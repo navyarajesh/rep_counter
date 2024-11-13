@@ -406,10 +406,59 @@
 #     main()
 
 
+# import streamlit as st
+# import os
+# from bicep_curl import bicep_curl_exercise
+# from shoulder_press import shoulder_press_exercise
+
+# def main():
+#     st.title("Exercise Repetition Counter")
+#     st.write("Select an exercise below to start counting repetitions:")
+
+#     exercise = st.selectbox("Choose an Exercise", ["", "Bicep Curl", "Shoulder Press"])
+
+#     if "STREAMLIT_ENV" in os.environ:
+#         st.warning("Camera access is disabled in this environment, so exercise counting is unavailable.")
+#     else:
+#         if exercise == "Bicep Curl" and st.button("Start Bicep Curl"):
+#             bicep_curl_exercise()
+#         elif exercise == "Shoulder Press" and st.button("Start Shoulder Press"):
+#             shoulder_press_exercise()
+#         else:
+#             st.info("Please select an exercise to begin.")
+
+# if __name__ == "__main__":
+#     main()
+
+# import streamlit as st
+
+# def main():
+#     st.title("Exercise Repetition Counter")
+#     st.write("Select an exercise below to start counting repetitions:")
+
+#     exercise = st.selectbox("Choose an Exercise", ["", "Bicep Curl", "Shoulder Press"])
+
+#     if "STREAMLIT_ENV" in os.environ:
+#         st.warning("Camera access is disabled in this environment, so exercise counting is unavailable.")
+#     else:
+#         if exercise == "Bicep Curl" and st.button("Start Bicep Curl"):
+#             bicep_curl_exercise()
+#         elif exercise == "Shoulder Press" and st.button("Start Shoulder Press"):
+#             shoulder_press_exercise()
+#         else:
+#             st.info("Please select an exercise to begin.")
+
+# def bicep_curl_exercise():
+#     st.camera_input("Capture your exercise here")
+
+# if __name__ == "__main__":
+#     main()
+
 import streamlit as st
 import os
 from bicep_curl import bicep_curl_exercise
 from shoulder_press import shoulder_press_exercise
+import streamlit_webrtc as webrtc
 
 def main():
     st.title("Exercise Repetition Counter")
@@ -421,11 +470,31 @@ def main():
         st.warning("Camera access is disabled in this environment, so exercise counting is unavailable.")
     else:
         if exercise == "Bicep Curl" and st.button("Start Bicep Curl"):
-            bicep_curl_exercise()
+            start_bicep_curl()
         elif exercise == "Shoulder Press" and st.button("Start Shoulder Press"):
-            shoulder_press_exercise()
+            start_shoulder_press()
         else:
             st.info("Please select an exercise to begin.")
+
+def start_bicep_curl():
+    # Here, we use WebRTC to access the webcam for the exercise counting
+    webrtc_stream = webrtc.WebRtcMode.SENDRECV
+    webrtc.config = webrtc.VideoEncoderConfig(
+        codec="vp8", 
+        quality=8, 
+        resolution="720p"
+    )
+    webrtc.run_video_streaming(bicep_curl_exercise)  # Pass the exercise function to WebRTC
+
+def start_shoulder_press():
+    # Similar to the bicep curl, use WebRTC for shoulder press
+    webrtc_stream = webrtc.WebRtcMode.SENDRECV
+    webrtc.config = webrtc.VideoEncoderConfig(
+        codec="vp8", 
+        quality=8, 
+        resolution="720p"
+    )
+    webrtc.run_video_streaming(shoulder_press_exercise)  # Pass the exercise function to WebRTC
 
 if __name__ == "__main__":
     main()
